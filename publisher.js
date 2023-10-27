@@ -1,4 +1,6 @@
+"use strict";
 // Importing modules
+const fs = require("fs");
 const ethers = require("ethers");
 const pino = require('pino');
 const logger = pino({
