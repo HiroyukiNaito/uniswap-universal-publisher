@@ -58,7 +58,7 @@ L2_RPC_WEBSOCKET_URL=ws://localhost:9546
 
 # CAUTION: If you don't have L2 RPC endpoint, please assign empty value (ex. L2_RPC_WEBSOCKET_URL="")
 # Currently supports only Optimism and Base
-# Will skip obtain L2 endpoint data
+# Will skip obtaining L2 endpoint data
 ```
 
 ## 5. Export environmental valuables
