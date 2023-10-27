@@ -2,7 +2,6 @@ const {
     runPublish,
     logger
 } = require("./publisher");
-const fs = require("fs");
 
 // setting arguments
 const args = {
