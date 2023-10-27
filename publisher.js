@@ -26,7 +26,7 @@ const txpoolMutation = async (args) => {
     provider.on('pending', async (tx) => {
              const txnData = await provider.getTransaction(tx);
                 (txnData) 
-                 ? ((txnData.to === router && hasUniswapCommands(txnData["data"])) 
+                 ? ((txnData["to"] === router && hasUniswapCommands(txnData["data"])) 
                     ? (async () => {
                         const decodedData =  uniswapFullDecodedInput(txnData["data"]);
                         const fullData = Object.assign({}, txnData, {"decodedData": decodedData, "createdAt": new Date()});
