@@ -1,6 +1,5 @@
 "use strict";
 // Importing modules
-const fs = require("fs");
 const ethers = require("ethers");
 const pino = require('pino');
 const logger = pino({
@@ -33,7 +32,7 @@ const txpoolMutation = async (args) => {
                         const query = createMutaionString(fullData, args["TxpoolMutation"], args["TxpoolMutationMethod"]);
                         await (callMutation(query))(args["graphql"]).
                             then(result => logger.info({result: result}, `${layer}: Txpool Data Published`)).
-                            catch(error => logger.error(error, `${layer}: Txpool Data Publish error!`));
+                            catch(error => logger.error(error, `${layer}: Txpool Data Publish Error!`));
                       })()
                     : null)  
                 : null ;                 
@@ -58,7 +57,7 @@ const txMutation = async (args) => {
                             const query = createMutaionString(fullData, args["TxnMutation"], args["TxnMutationMethod"]);
                             await (callMutation(query))(args["graphql"]).
                                 then(result => logger.info({result: result}, `${layer}: Transaction Data Published`)).
-                                catch(error => logger.error(error, `${layer}: Transaction Data Publish error!`));
+                                catch(error => logger.error(error, `${layer}: Transaction Data Publish Error!`));
                           })()
                         : null;             
                 }));
