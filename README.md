@@ -54,10 +54,10 @@ RPC_WEBSOCKET_URL=ws://localhost:8546
 L2_UNIVERSAL_ROUTER_ADDRESS=0x198EF79F1F515F02dFE9e3115eD9fC07183f02fC
 
 # Your L2 Websocket RPC endpoint url
+# Currently supports only Optimism and Base
 L2_RPC_WEBSOCKET_URL=ws://localhost:9546
 
 # CAUTION: If you don't have L2 RPC endpoint, please assign empty value (ex. L2_RPC_WEBSOCKET_URL="")
-# Currently supports only Optimism and Base
 # Will skip obtaining L2 endpoint data
 ```
 
