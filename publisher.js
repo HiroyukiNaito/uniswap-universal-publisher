@@ -3,7 +3,7 @@
 const ethers = require("ethers");
 const pino = require('pino');
 const logger = pino({
-  level: process.env.PINO_LOG_LEVEL || 'info',
+  level: process.env.PINO_LOG_LEVEL ?? 'info',
   formatters: {
     bindings: (bindings) => ({ pid: bindings.pid, host: bindings.hostname }),
     level: (label) => ({ level: label.toUpperCase()}),
@@ -28,7 +28,7 @@ const txpoolMutation = async (args) => {
                  ? ((txnData["to"] === router && hasUniswapCommands(txnData["data"])) 
                     ? (async () => {
                         const decodedData =  uniswapFullDecodedInput(txnData["data"]);
-                        const fullData = Object.assign({}, txnData, {"decodedData": decodedData, "createdAt": new Date()});
+                        const fullData = {...txnData, "decodedData": decodedData, "createdAt": new Date()};
                         const query = createMutaionString(fullData, args["TxpoolMutation"], args["TxpoolMutationMethod"]);
                         await (callMutation(query))(args["graphql"]).
                             then(result => logger.info({result: result}, `${layer}: Txpool Data Published`)).
@@ -53,7 +53,7 @@ const txMutation = async (args) => {
                       (txnData["to"] === router && hasUniswapCommands(txnData["data"])) 
                         ? (async () => {
                             const decodedData =  uniswapFullDecodedInput(txnData["data"]);
-                            const fullData = Object.assign({}, txnData, {"decodedData": decodedData,"blockHeader": blockHeader, "createdAt": new Date()})
+                            const fullData = {...txnData, "decodedData": decodedData, "blockHeader": blockHeader, "createdAt": new Date()}
                             const query = createMutaionString(fullData, args["TxnMutation"], args["TxnMutationMethod"]);
                             await (callMutation(query))(args["graphql"]).
                                 then(result => logger.info({result: result}, `${layer}: Transaction Data Published`)).
