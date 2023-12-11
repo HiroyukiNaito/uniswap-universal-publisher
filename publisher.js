@@ -121,22 +121,17 @@ const callMutation = (query) => async (graphqlUrl) =>  {
     return responseData
 }
 
-const runPublish = (args) => {
-   // Respective Data Registering
-   if(args["layer"]==="l1" &&  args["TxnMutation"]==="createTxnData"){
-     (txMutation(args),txpoolMutation(args));
-   }
-   if(args["layer"]==="l2" &&  args["TxnMutation"]==="createl2TxnData"){
-     txMutation(args);
-   }
-   // Bulk Data Registering
-   if(args["layer"]==="l1" &&  args["TxnMutation"]==="createBulkTxnData"){
-     (txBulkMutation(args),txpoolMutation(args));
-   }
-   if(args["layer"]==="l2" &&  args["TxnMutation"]==="createBulkl2TxnData"){
-     txBulkMutation(args);
-   }
-}
+const runPublish = (args) => (
+   (args["layer"]==="l1" &&  args["TxnMutation"]==="createTxnData")// Respective Data Registering
+   ? (txMutation(args),txpoolMutation(args))
+   : (args["layer"]==="l2" &&  args["TxnMutation"]==="createl2TxnData")
+   ? (txMutation(args))
+   : (args["layer"]==="l1" &&  args["TxnMutation"]==="createBulkTxnData") // Bulk Data Registering
+   ? (txBulkMutation(args),txpoolMutation(args))
+   : (args["layer"]==="l2" &&  args["TxnMutation"]==="createBulkl2TxnData")
+   ? (txBulkMutation(args))
+   : (() => {throw new Error('Wrong Initial Setting!')})()
+)
 
 module.exports = {
     txpoolMutation,
