@@ -64,6 +64,35 @@ const txMutation = async (args) => {
     })
 };
 
+
+// Publishing Transaction data **in Bulk** by Graphql Mutation call
+const txBulkMutation = async (args) => {
+  const router = args["router"];
+  const wssUrl = args["wss"];
+  const layer = args["layer"];
+  const provider = new ethers.WebSocketProvider(wssUrl); 
+  provider.on('block', async (tx) => {
+              const blockHeader = await provider.getBlock(tx);
+              const blockHashList = blockHeader["transactions"];
+              const bulkDataWithNull = await Promise.all(blockHashList.map(async (j) => { 
+                    const txnData = await provider.getTransaction(j);
+                    return (txnData["to"] === router && hasUniswapCommands(txnData["data"])) 
+                      ? (async () => {
+                          const decodedData =  uniswapFullDecodedInput(txnData["data"]);
+                          const fullData = {...txnData, "decodedData": decodedData, "blockHeader": blockHeader, "createdAt": new Date()}
+                          return fullData
+                        })()
+                      : null;             
+              }));
+              const bulkData = bulkDataWithNull.filter((commands) => commands !== null) //filter null data
+              const query = createMutaionString(bulkData, args["TxnMutation"], args["TxnMutationMethod"]);
+              await (callMutation(query))(args["graphql"]).
+                  then(result => logger.info({result: result}, `${layer}: Transaction Bulk Data Published`)).
+                  catch(error => logger.error(error, `${layer}: Transaction Data Publish Error!`));
+  })
+};
+
+
 const createMutaionString =  (fullData, mutationName, mutationMethod) => {
    // Bigint to String
    const jsonData = JSON.stringify(fullData, (_, v) => typeof v === 'bigint' ? v.toString() : v);
@@ -77,6 +106,7 @@ const createMutaionString =  (fullData, mutationName, mutationMethod) => {
             hash
           }
         }`})
+    console.log
     return query
 }
 
@@ -92,15 +122,26 @@ const callMutation = (query) => async (graphqlUrl) =>  {
 }
 
 const runPublish = (args) => {
-    // L2 don't have txpool basically, so only call txMutation(args)
-     args["layer"]==="l1"  
-      ?  (txpoolMutation(args),txMutation(args))  
-      :  txMutation(args);
+   // Respective Data Registering
+   if(args["layer"]==="l1" &&  args["TxnMutation"]==="createTxnData"){
+     (txMutation(args),txpoolMutation(args));
+   }
+   if(args["layer"]==="l2" &&  args["TxnMutation"]==="createl2TxnData"){
+     txMutation(args);
+   }
+   // Bulk Data Registering
+   if(args["layer"]==="l1" &&  args["TxnMutation"]==="createBulkTxnData"){
+     (txBulkMutation(args),txpoolMutation(args));
+   }
+   if(args["layer"]==="l2" &&  args["TxnMutation"]==="createBulkl2TxnData"){
+     txBulkMutation(args);
+   }
 }
 
 module.exports = {
     txpoolMutation,
     txMutation,
+    txBulkMutation,
     createMutaionString,
     callMutation,
     runPublish,
