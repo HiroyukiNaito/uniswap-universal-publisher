@@ -1,5 +1,6 @@
 "use strict";
 // Importing modules
+const APP_SECRET = process.env.APP_SECRET.trim();
 const ethers = require("ethers");
 const pino = require('pino');
 const logger = pino({
@@ -31,7 +32,7 @@ const txpoolMutation = async (args) => {
                         const fullData = {...txnData, "decodedData": decodedData, "createdAt": new Date()};
                         const query = createMutaionString(fullData, args["TxpoolMutation"], args["TxpoolMutationMethod"]);
                         await (callMutation(query))(args["graphql"]).
-                            then(result => logger.info({result: result}, `${layer}: Txpool Data Published`)).
+                            then(result => logger.info({result: result}, `${layer}: Txpool Data Request processed`)).
                             catch(error => logger.error(error, `${layer}: Txpool Data Publish Error!`));
                       })()
                     : null)  
@@ -56,7 +57,7 @@ const txMutation = async (args) => {
                             const fullData = {...txnData, "decodedData": decodedData, "blockHeader": blockHeader, "createdAt": new Date()}
                             const query = createMutaionString(fullData, args["TxnMutation"], args["TxnMutationMethod"]);
                             await (callMutation(query))(args["graphql"]).
-                                then(result => logger.info({result: result}, `${layer}: Transaction Data Published`)).
+                                then(result => logger.info({result: result}, `${layer}: Transaction Data Request Processed`)).
                                 catch(error => logger.error(error, `${layer}: Transaction Data Publish Error!`));
                           })()
                         : null;             
@@ -87,7 +88,7 @@ const txBulkMutation = async (args) => {
               const bulkData = bulkDataWithNull.filter((commands) => commands !== null) //filter null data
               const query = createMutaionString(bulkData, args["TxnMutation"], args["TxnMutationMethod"]);
               await (callMutation(query))(args["graphql"]).
-                  then(result => logger.info({result: result}, `${layer}: Transaction Bulk Data Published`)).
+                  then(result => logger.info({result: result}, `${layer}: Transaction Bulk Data Request Processed`)).
                   catch(error => logger.error(error, `${layer}: Transaction Data Publish Error!`));
   })
 };
@@ -113,7 +114,7 @@ const callMutation = (query) => async (graphqlUrl) =>  {
     const response = await fetch(graphqlUrl, {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", 'Authorization': `Bearer: ${APP_SECRET}` },
           body: query
         });
     const responseData = await response.json();
