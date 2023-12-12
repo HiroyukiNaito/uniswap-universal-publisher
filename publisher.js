@@ -106,7 +106,6 @@ const createMutaionString =  (fullData, mutationName, mutationMethod) => {
             hash
           }
         }`})
-    console.log
     return query
 }
 
